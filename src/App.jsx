@@ -5,7 +5,7 @@ import shuffleArray from './utils/shuffleArray';
 import Home from './components/Home';
 import { GoGear } from 'react-icons/go';
 import LevelSelect from './components/LevelSelect';
-import LossModal from './components/LossModal';
+import GameModal from './components/GameModal';
 import {
   getFromLocalStorage,
   setToLocalStorage,
@@ -169,20 +169,16 @@ const App = () => {
         </div>
       </div>
 
-      <div className='game-controls'>
-        {isWon && displayMessage && <h1>Gagné</h1>}
-        {displayButton && isWon && (
-          <button onClick={() => startCurrentLevel(currentLevel)}>
-            Continuer
-          </button>
-        )}
-      </div>
-
-      <LossModal
-        isVisible={isLost && displayMessage && displayButton}
+      <GameModal
+        isVisible={(isWon || isLost) && displayMessage && displayButton}
+        isWon={isWon}
         lossCount={lossCount}
+        onContinue={() => startCurrentLevel(currentLevel)}
         onRestart={() => startCurrentLevel(currentLevel)}
-        onShowCards={flipAllCards}
+        onShowCards={() => {
+          flipAllCards();
+          setDisplayMessage(false);
+        }}
       />
 
       <div className='game-container'>
@@ -200,7 +196,6 @@ const App = () => {
                 isWon={isWon}
                 setIsWon={setIsWon}
                 currentLevel={currentLevel}
-                setCurrentLevel={setCurrentLevel}
               />
             );
           })}

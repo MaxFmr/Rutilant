@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const Card = ({
   card,
@@ -8,16 +8,15 @@ const Card = ({
   setIsLost,
   isWon,
   setIsWon,
-  setCurrentLevel,
   currentLevel,
 }) => {
   const [isClickable, setIsClickable] = useState(true);
   const BackPath = new URL(
-    `../assets/Carrds/back/0${card.back}_Back.png`,
+    `../assets/Carrds/back/${String(card.back).padStart(2, '0')}_Back.png`,
     import.meta.url
   ).href;
   const FrontPath = new URL(
-    `../assets/Carrds/front/0${card.value}_Front.png`,
+    `../assets/Carrds/front/${String(card.value).padStart(2, '0')}_Front.png`,
     import.meta.url
   ).href;
 
@@ -40,7 +39,6 @@ const Card = ({
       // Vérifier si c'était la dernière carte du niveau
       if (expectedValue === numberOfCards) {
         setIsWon(true);
-        setCurrentLevel(currentLevel + 1);
       }
     } else {
       // Mauvaise carte - perdre
@@ -65,21 +63,18 @@ const Card = ({
   }, [isWon, isLost]);
 
   return (
-    <>
-      <div
-        className='card'
-        onClick={() => {
-          isClickable && playCard();
-        }}>
-        {!cardsClicked[card.value - 1] ? (
-          <img src={BackPath} alt='Carte' />
-        ) : (
-          <img src={FrontPath} alt='Carte' />
-        )}
-      </div>
-
-      <span>{card.value}</span>
-    </>
+    <div
+      className="card"
+      onClick={() => {
+        isClickable && playCard();
+      }}
+    >
+      {!cardsClicked[card.value - 1] ? (
+        <img src={BackPath} alt="Carte" />
+      ) : (
+        <img src={FrontPath} alt="Carte" />
+      )}
+    </div>
   );
 };
 export default Card;
