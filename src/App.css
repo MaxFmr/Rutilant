@@ -1,29 +1,475 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  display: flex;
-  justify-content: space-between;
+/* Variables CSS pour thème cohérent */
+:root {
+  --primary-color: #646cff;
+  --primary-dark: #535bf2;
+  --success-color: #4ade80;
+  --danger-color: #f87171;
+  --bg-dark: rgba(15, 23, 42, 0.95);
+  --bg-light: rgba(255, 255, 255, 0.1);
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.3);
+  --border-radius: 16px;
 }
 
+/* Fond avec gradient animé */
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#root {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+/* Container pour les cartes du jeu */
+.game-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1.5rem;
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Container pour les boutons et messages de jeu */
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 50;
+}
+
+/* Modale pour messages de victoire/défaite */
+.game-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.game-modal-content {
+  background: var(--bg-dark);
+  padding: 3rem 4rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--bg-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  animation: slideUp 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Bouton de triche discret */
+.cheat-button {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  background: rgba(107, 114, 128, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  min-width: auto;
+  z-index: 500;
+}
+
+.cheat-button:hover {
+  opacity: 1;
+  background: rgba(107, 114, 128, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Cartes avec effet 3D */
 .card {
   cursor: pointer;
-  margin-left: 5%;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+  width: 100%;
+  max-width: 180px;
+  aspect-ratio: 2/3;
 }
+
 .card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 1em #646cffaa;
+  transform: translateY(-10px) scale(1.08) rotateZ(2deg);
+  filter: drop-shadow(0 12px 24px rgba(100, 108, 255, 0.4));
 }
+
+.card:active {
+  transform: translateY(-5px) scale(1.02);
+}
+
 .card img {
   height: 100%;
   width: 100%;
-}
-.read-the-docs {
-  color: #888;
+  border-radius: 12px;
+  object-fit: cover;
 }
 
+/* Score container amélioré */
+.score-container {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--bg-dark);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--bg-light);
+  z-index: 100;
+  animation: slideInLeft 0.5s ease;
+}
+
+.score-container div {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.score-container span {
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Bouton paramètres stylisé */
 .settings {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--bg-dark);
+  padding: 1rem;
+  border-radius: 50%;
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--bg-light);
+  z-index: 100;
+  color: white;
+  animation: slideInRight 0.5s ease;
+}
+
+.settings:hover {
+  transform: rotate(90deg) scale(1.1);
+  background: var(--primary-color);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Boutons stylisés */
+button {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(100, 108, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  min-width: 200px;
+}
+
+/* Boutons de jeu spécifiques */
+.game-controls button {
+  margin: 0;
+}
+
+button::before {
+  content: '';
   position: absolute;
-  top: 5%;
-  right: 5%;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(100, 108, 255, 0.6);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Messages de victoire/défaite */
+h1 {
+  font-size: 4rem;
+  margin: 2rem;
+  animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  z-index: 10;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* Message de perte */
+.loss-message {
+  color: var(--danger-color);
+  font-size: 1.2rem;
+  font-weight: 600;
+  animation: shake 0.5s ease;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+/* Responsive design */
+
+/* Tablettes (portrait) */
+@media (max-width: 1024px) {
+  .game-container {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1.2rem;
+    max-width: 700px;
+  }
+
+  .card {
+    max-width: 150px;
+  }
+}
+
+/* Tablettes et grands mobiles */
+@media (max-width: 768px) {
+  #root {
+    padding: 1rem;
+    padding-top: 5rem;
+    gap: 1.5rem;
+  }
+
+  .game-container {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 1rem;
+    max-width: 100%;
+  }
+
+  .score-container {
+    top: 1rem;
+    left: 1rem;
+    padding: 1rem;
+    font-size: 0.85rem;
+    gap: 0.5rem;
+  }
+
+  .settings {
+    top: 1rem;
+    right: 1rem;
+    padding: 0.75rem;
+  }
+
+  .card {
+    max-width: 130px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin: 1rem;
+  }
+
+  button {
+    padding: 0.9rem 1.8rem;
+    font-size: 1rem;
+    min-width: 180px;
+  }
+}
+
+/* Mobiles */
+@media (max-width: 480px) {
+  #root {
+    padding: 0.5rem;
+    padding-top: 1rem;
+    padding-bottom: 8rem;
+  }
+
+  .game-container {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .score-container {
+    position: fixed;
+    bottom: 1rem;
+    top: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 2rem);
+    max-width: 350px;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 0.5rem;
+  }
+
+  .score-container div {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .settings {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.6rem;
+    font-size: 1.2rem;
+  }
+
+  .card {
+    max-width: 90px;
+  }
+
+  .card:hover {
+    transform: translateY(-5px) scale(1.05);
+  }
+
+  h1 {
+    font-size: 2rem;
+    margin: 0.75rem;
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    min-width: 160px;
+  }
+
+  .game-controls {
+    gap: 0.75rem;
+  }
+}
+
+/* Très petits mobiles */
+@media (max-width: 360px) {
+  .game-container {
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .card {
+    max-width: 75px;
+  }
+
+  button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+    min-width: 140px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
 }

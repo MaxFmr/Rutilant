@@ -5,6 +5,11 @@ import shuffleArray from './utils/shuffleArray';
 import Home from './components/Home';
 import { GoGear } from 'react-icons/go';
 import LevelSelect from './components/LevelSelect';
+import LossModal from './components/LossModal';
+import {
+  getFromLocalStorage,
+  setToLocalStorage,
+} from './utils/localStorage';
 
 const App = () => {
   //a utiliser pour le suivi des niveaux et des sauvegardes
@@ -21,21 +26,11 @@ const App = () => {
   //   level10: false,
   // });
 
-  const [cardsClicked, setCardsClicked] = useState({
-    card1: false,
-    card2: false,
-    card3: false,
-    card4: false,
-    card5: false,
-    card6: false,
-    card7: false,
-    card8: false,
-    card9: false,
-    card10: false,
-  });
+  const [cardsClicked, setCardsClicked] = useState(Array(10).fill(false));
 
-  const [score, setScore] = useState(1);
+  const [lossCount, setLossCount] = useState(0);
   const [bestScore, setBestScore] = useState({});
+  const [gamesPlayed, setGamesPlayed] = useState(0);
 
   const [currentLevel, setCurrentLevel] = useState(1);
   const [cards, setCards] = useState([]);
@@ -50,33 +45,26 @@ const App = () => {
     const backValues = [];
     const valueValues = [];
 
-    for (let i = 0; i < level; i++) {
+    // Le niveau 1 commence avec 2 cartes, jusqu'à un maximum de 10 cartes
+    const numberOfCards = Math.min(level + 1, 10);
+
+    for (let i = 0; i < numberOfCards; i++) {
       backValues.push(i + 1);
       valueValues.push(i + 1);
     }
     const array = [];
     setDisplayButton(false);
+    setDisplayMessage(false);
     setCards([]);
     setIsLost(false);
     setIsWon(false);
 
-    setCardsClicked({
-      card1: false,
-      card2: false,
-      card3: false,
-      card4: false,
-      card5: false,
-      card6: false,
-      card7: false,
-      card8: false,
-      card9: false,
-      card10: false,
-    });
+    setCardsClicked(Array(10).fill(false));
 
     shuffleArray(backValues);
     shuffleArray(valueValues);
 
-    for (let i = 0; i < level; i++) {
+    for (let i = 0; i < numberOfCards; i++) {
       const card = {
         back: backValues.pop(),
         value: valueValues.pop(),
@@ -88,12 +76,20 @@ const App = () => {
   }
 
   useEffect(() => {
-    const maxLevel = JSON.parse(localStorage.getItem('maxLevel'));
+    const maxLevel = getFromLocalStorage('maxLevel', 1);
+    const savedBestScore = getFromLocalStorage('bestScore', {});
+    const savedGamesPlayed = getFromLocalStorage('gamesPlayed', 0);
 
-    if (!maxLevel || maxLevel === 1) {
-      localStorage.setItem('maxLevel', JSON.stringify(currentLevel));
-      setDisplayHome(true);
+    if (!maxLevel) {
+      setToLocalStorage('maxLevel', currentLevel);
     }
+
+    setBestScore(savedBestScore);
+    setGamesPlayed(savedGamesPlayed);
+
+    // Toujours afficher le menu au démarrage
+    setDisplayHome(true);
+
     startCurrentLevel(currentLevel);
   }, []);
 
@@ -102,37 +98,36 @@ const App = () => {
       setTimeout(() => {
         setDisplayMessage(true);
         setDisplayButton(true);
-        setScore(score + 1);
+        setLossCount(lossCount + 1);
+        setCurrentLevel(1); // Retour au niveau 1 à chaque perte
+
+        // Incrémenter le nombre total de parties jouées
+        const newGamesPlayed = gamesPlayed + 1;
+        setGamesPlayed(newGamesPlayed);
+        setToLocalStorage('gamesPlayed', newGamesPlayed);
       }, 350);
     }
     if (isWon) {
-      setScore(1);
       setDisplayButton(true);
       setDisplayMessage(true);
-      localStorage.setItem('maxLevel', JSON.stringify(currentLevel));
 
-      const memorizedScore = JSON.parse(localStorage.getItem('bestScore'));
+      // Passer au niveau suivant
+      const nextLevel = currentLevel + 1;
+      setCurrentLevel(nextLevel);
+      setToLocalStorage('maxLevel', nextLevel);
 
-      localStorage.setItem(
-        'bestScore',
-        JSON.stringify({ ...memorizedScore, [currentLevel - 1]: score })
-      );
+      const memorizedScore = getFromLocalStorage('bestScore', {});
+
+      setToLocalStorage('bestScore', {
+        ...memorizedScore,
+        [currentLevel]: lossCount,
+      });
+      setLossCount(0);
     }
   }, [isLost, isWon]);
 
   const flipAllCards = () => {
-    setCardsClicked({
-      card1: true,
-      card2: true,
-      card3: true,
-      card4: true,
-      card5: true,
-      card6: true,
-      card7: true,
-      card8: true,
-      card9: true,
-      card10: true,
-    });
+    setCardsClicked(Array(10).fill(true));
   };
 
   return displayHome ? (
@@ -142,6 +137,7 @@ const App = () => {
       setCurrentLevel={setCurrentLevel}
       setDisplayLevelSelect={setDisplayLevelSelect}
       displayLevelSelect={displayLevelSelect}
+      startCurrentLevel={startCurrentLevel}
     />
   ) : (
     <>
@@ -159,43 +155,56 @@ const App = () => {
         onClick={() => setDisplayHome(true)}
         size={30}
       />
-      <div>
-        <span>Score : {score}</span>
+      <div className='score-container'>
+        <div>
+          <span>Niveau : {currentLevel}</span>
+        </div>
+        <div>
+          <span>Parties jouées : {gamesPlayed}</span>
+        </div>
+        <div>
+          <span>
+            Meilleur niveau : {getFromLocalStorage('maxLevel', 1)}
+          </span>
+        </div>
       </div>
-      {displayButton && (
-        <button onClick={() => startCurrentLevel(currentLevel)}>
-          {isLost ? 'Recommencer' : 'Continuer'}
-        </button>
-      )}
 
-      {displayButton && isLost && (
-        <button onClick={() => flipAllCards()}>Afficher les cartes</button>
-      )}
+      <div className='game-controls'>
+        {isWon && displayMessage && <h1>Gagné</h1>}
+        {displayButton && isWon && (
+          <button onClick={() => startCurrentLevel(currentLevel)}>
+            Continuer
+          </button>
+        )}
+      </div>
 
-      {isWon && displayMessage && <h1>Gagné</h1>}
+      <LossModal
+        isVisible={isLost && displayMessage && displayButton}
+        lossCount={lossCount}
+        onRestart={() => startCurrentLevel(currentLevel)}
+        onShowCards={flipAllCards}
+      />
 
-      {isLost && displayMessage && <h1>Perdu</h1>}
-
-      {score > 1 && <span>Vous avez perdu {score} fois</span>}
-
-      {cards &&
-        !displayLevelSelect &&
-        cards.map((card, index) => {
-          return (
-            <Card
-              key={index}
-              card={card}
-              cardsClicked={cardsClicked}
-              setCardsClicked={setCardsClicked}
-              isLost={isLost}
-              setIsLost={setIsLost}
-              isWon={isWon}
-              setIsWon={setIsWon}
-              currentLevel={currentLevel}
-              setCurrentLevel={setCurrentLevel}
-            />
-          );
-        })}
+      <div className='game-container'>
+        {cards &&
+          !displayLevelSelect &&
+          cards.map((card, index) => {
+            return (
+              <Card
+                key={index}
+                card={card}
+                cardsClicked={cardsClicked}
+                setCardsClicked={setCardsClicked}
+                isLost={isLost}
+                setIsLost={setIsLost}
+                isWon={isWon}
+                setIsWon={setIsWon}
+                currentLevel={currentLevel}
+                setCurrentLevel={setCurrentLevel}
+              />
+            );
+          })}
+      </div>
     </>
   );
 };
