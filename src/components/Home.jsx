@@ -66,22 +66,22 @@ const Home = ({
               onClick={restartFromBeginning}>
               🎯 Recommencer depuis le début
             </button>
+            <button
+              className='home-button danger'
+              onClick={() => {
+                if (
+                  window.confirm(
+                    'Voulez-vous vraiment réinitialiser toute votre progression? Cette action est irréversible.'
+                  )
+                ) {
+                  localStorage.clear();
+                  window.location.reload();
+                }
+              }}>
+              🔄 Réinitialiser la progression
+            </button>
           </>
         )}
-
-        <button
-          className='home-button danger'
-          onClick={() => {
-            if (
-              window.confirm(
-                'Voulez-vous vraiment quitter? Votre progression sera sauvegardée.'
-              )
-            ) {
-              window.close();
-            }
-          }}>
-          ❌ Quitter
-        </button>
       </div>
     </div>
   );
