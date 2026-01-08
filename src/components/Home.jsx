@@ -1,5 +1,5 @@
-import { getFromLocalStorage } from '../utils/localStorage';
-import './Home.css';
+import { getFromLocalStorage } from "../utils/localStorage";
+import "./Home.css";
 
 const Home = ({
   setDisplayHome,
@@ -9,7 +9,7 @@ const Home = ({
   displayLevelSelect,
   startCurrentLevel,
 }) => {
-  const maxLevel = getFromLocalStorage('maxLevel', 1);
+  const maxLevel = getFromLocalStorage("maxLevel", 1);
 
   const continueGame = () => {
     setDisplayHome(false);
@@ -31,56 +31,58 @@ const Home = ({
   };
 
   return (
-    <div className='home-container'>
+    <div className="home-container">
       {/* Éléments décoratifs */}
-      <div className='home-decoration circle circle-1'></div>
-      <div className='home-decoration circle circle-2'></div>
+      <div className="home-decoration circle circle-1"></div>
+      <div className="home-decoration circle circle-2"></div>
 
-      <h1 className='home-title'>🎮 RUTILANT</h1>
-      <p className='home-subtitle'>
+      <h1 className="home-title">🎮 RUTILANT</h1>
+      <p className="home-subtitle">
         Tentez votre chance et atteignez le niveau maximum!
       </p>
 
-      <div className='home-buttons'>
+      <div className="home-buttons">
         {maxLevel === 1 ? (
           <button
-            className='home-button'
+            className="home-button"
             onClick={() => {
               setDisplayHome(false);
               setCurrentLevel(1);
               startCurrentLevel(1);
-              displayLevelSelect && setDisplayLevelSelect(false);
-            }}>
+            }}
+          >
             ▶ Nouvelle Partie
           </button>
         ) : (
-          <button className='home-button' onClick={continueGame}>
+          <button className="home-button" onClick={continueGame}>
             ▶ Continuer (Niveau {maxLevel})
           </button>
         )}
 
         {maxLevel > 1 && (
           <>
-            <button className='home-button secondary' onClick={levelSelect}>
+            <button className="home-button secondary" onClick={levelSelect}>
               📊 Sélection du niveau
             </button>
             <button
-              className='home-button secondary'
-              onClick={restartFromBeginning}>
+              className="home-button secondary"
+              onClick={restartFromBeginning}
+            >
               🎯 Recommencer depuis le début
             </button>
             <button
-              className='home-button danger'
+              className="home-button danger"
               onClick={() => {
                 if (
                   window.confirm(
-                    'Voulez-vous vraiment réinitialiser toute votre progression? Cette action est irréversible.'
+                    "Voulez-vous vraiment réinitialiser toute votre progression? Cette action est irréversible."
                   )
                 ) {
                   localStorage.clear();
                   window.location.reload();
                 }
-              }}>
+              }}
+            >
               🔄 Réinitialiser la progression
             </button>
           </>
