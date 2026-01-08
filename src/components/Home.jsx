@@ -47,6 +47,9 @@ const Home = ({
             className='home-button'
             onClick={() => {
               setDisplayHome(false);
+              setCurrentLevel(1);
+              startCurrentLevel(1);
+              displayLevelSelect && setDisplayLevelSelect(false);
             }}>
             ▶ Nouvelle Partie
           </button>

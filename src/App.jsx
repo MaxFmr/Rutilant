@@ -1,15 +1,12 @@
-import Card from './components/Card';
-import { useState, useEffect } from 'react';
-import './App.css';
-import shuffleArray from './utils/shuffleArray';
-import Home from './components/Home';
-import { GoGear } from 'react-icons/go';
-import LevelSelect from './components/LevelSelect';
-import GameModal from './components/GameModal';
-import {
-  getFromLocalStorage,
-  setToLocalStorage,
-} from './utils/localStorage';
+import Card from "./components/Card";
+import { useState, useEffect } from "react";
+import "./App.css";
+import shuffleArray from "./utils/shuffleArray";
+import Home from "./components/Home";
+import { GoGear } from "react-icons/go";
+import LevelSelect from "./components/LevelSelect";
+import GameModal from "./components/GameModal";
+import { getFromLocalStorage, setToLocalStorage } from "./utils/localStorage";
 
 const App = () => {
   //a utiliser pour le suivi des niveaux et des sauvegardes
@@ -76,12 +73,12 @@ const App = () => {
   }
 
   useEffect(() => {
-    const maxLevel = getFromLocalStorage('maxLevel', 1);
-    const savedBestScore = getFromLocalStorage('bestScore', {});
-    const savedGamesPlayed = getFromLocalStorage('gamesPlayed', 0);
+    const maxLevel = getFromLocalStorage("maxLevel", 1);
+    const savedBestScore = getFromLocalStorage("bestScore", {});
+    const savedGamesPlayed = getFromLocalStorage("gamesPlayed", 0);
 
     if (!maxLevel) {
-      setToLocalStorage('maxLevel', currentLevel);
+      setToLocalStorage("maxLevel", currentLevel);
     }
 
     setBestScore(savedBestScore);
@@ -104,7 +101,7 @@ const App = () => {
         // Incrémenter le nombre total de parties jouées
         const newGamesPlayed = gamesPlayed + 1;
         setGamesPlayed(newGamesPlayed);
-        setToLocalStorage('gamesPlayed', newGamesPlayed);
+        setToLocalStorage("gamesPlayed", newGamesPlayed);
       }, 350);
     }
     if (isWon) {
@@ -114,11 +111,11 @@ const App = () => {
       // Passer au niveau suivant
       const nextLevel = currentLevel + 1;
       setCurrentLevel(nextLevel);
-      setToLocalStorage('maxLevel', nextLevel);
+      setToLocalStorage("maxLevel", nextLevel);
 
-      const memorizedScore = getFromLocalStorage('bestScore', {});
+      const memorizedScore = getFromLocalStorage("bestScore", {});
 
-      setToLocalStorage('bestScore', {
+      setToLocalStorage("bestScore", {
         ...memorizedScore,
         [currentLevel]: lossCount,
       });
@@ -151,11 +148,13 @@ const App = () => {
       )}
 
       <GoGear
-        className='settings'
-        onClick={() => setDisplayHome(true)}
+        className="settings"
+        onClick={() => {
+          setDisplayHome(true);
+        }}
         size={30}
       />
-      <div className='score-container'>
+      <div className="score-container">
         <div>
           <span>Niveau : {currentLevel}</span>
         </div>
@@ -163,9 +162,7 @@ const App = () => {
           <span>Parties jouées : {gamesPlayed}</span>
         </div>
         <div>
-          <span>
-            Meilleur niveau : {getFromLocalStorage('maxLevel', 1)}
-          </span>
+          <span>Meilleur niveau : {getFromLocalStorage("maxLevel", 1)}</span>
         </div>
       </div>
 
@@ -181,7 +178,7 @@ const App = () => {
         }}
       />
 
-      <div className='game-container'>
+      <div className="game-container">
         {cards &&
           !displayLevelSelect &&
           cards.map((card, index) => {
